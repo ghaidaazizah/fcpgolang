@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 )
 
 type UserAPI interface {
@@ -64,7 +65,12 @@ func (u *userAPI) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := u.userService.Login(loginData.Email, loginData.Password)
+	var userModel = model.User{
+		Email:    loginData.Email,
+		Password: loginData.Password,
+	}
+
+	tokenStr, err := u.userService.Login(&userModel)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid credentials") {
 			c.JSON(http.StatusUnauthorized, model.NewErrorResponse("invalid credentials"))
@@ -74,25 +80,25 @@ func (u *userAPI) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := u.userService.GenerateToken(user)
+	c.SetCookie("session_token", *tokenStr, 3600, "/", "", false, true)
+
+	var claim model.Claims
+	token, err := jwt.ParseWithClaims(*tokenStr, &claim, func(t *jwt.Token) (interface{}, error) {
+		return model.JwtKey, nil
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.NewErrorResponse("could not generate token"))
 		return
 	}
+	if !token.Valid {
+		c.JSON(http.StatusBadRequest, model.NewErrorResponse("Token not valid"))
+	}
 
-	c.JSON(http.StatusOK, model.NewSuccessResponseWithData("login success", gin.H{
-		"token": token,
-	}))
+	c.JSON(http.StatusOK, model.NewSuccessResponse("login success"))
 }
 
 func (u *userAPI) GetUserTaskCategory(c *gin.Context) {
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, model.NewErrorResponse("unauthorized"))
-		return
-	}
-
-	tasks, err := u.userService.GetUserTasksByCategory(userID.(int))
+	tasks, err := u.userService.GetUserTaskCategory()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.NewErrorResponse("could not retrieve tasks"))
 		return

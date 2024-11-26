@@ -3,7 +3,6 @@ package repository
 import (
 	"a21hc3NpZ25tZW50/db/filebased"
 	"a21hc3NpZ25tZW50/model"
-	"fmt"
 )
 
 type UserRepository interface {
@@ -23,7 +22,7 @@ func NewUserRepo(filebasedDb *filebased.Data) *userRepository {
 func (r *userRepository) GetUserByEmail(email string) (model.User, error) {
 	user, err := r.filebasedDb.GetUserByEmail(email)
 	if err != nil {
-		return model.User{}, fmt.Errorf("failed to find user by email %s: %v", email, err)
+		return model.User{}, err
 	}
 	return user, nil
 }
@@ -31,15 +30,15 @@ func (r *userRepository) GetUserByEmail(email string) (model.User, error) {
 func (r *userRepository) CreateUser(user model.User) (model.User, error) {
 	createdUser, err := r.filebasedDb.CreateUser(user)
 	if err != nil {
-		return model.User{}, fmt.Errorf("failed to create user: %v", err)
+		return model.User{}, err
 	}
 	return createdUser, nil
 }
 
 func (r *userRepository) GetUserTaskCategory() ([]model.UserTaskCategory, error) {
-	userTaskCategories, err := r.filebasedDb.GetUserTaskCategories()
+	userTaskCategories, err := r.filebasedDb.GetUserTaskCategory()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get user task categories: %v", err)
+		return nil, err
 	}
 	return userTaskCategories, nil
 }

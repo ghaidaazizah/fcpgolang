@@ -45,7 +45,7 @@ func (ct *categoryAPI) UpdateCategory(c *gin.Context) {
 	// Parse category ID from URL parameters
 	categoryID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, model.ErrorResponse{Error: "Invalid category ID"})
+		c.JSON(http.StatusBadRequest, model.ErrorResponse{Error: "invalid Category ID"})
 		return
 	}
 
@@ -63,14 +63,13 @@ func (ct *categoryAPI) UpdateCategory(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, model.SuccessResponse{Message: "update category success"})
+	c.JSON(http.StatusOK, model.SuccessResponse{Message: "category update success"})
 }
-
 
 func (ct *categoryAPI) DeleteCategory(c *gin.Context) {
 	categoryID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, model.ErrorResponse{Error: "Invalid category ID"})
+		c.JSON(http.StatusBadRequest, model.ErrorResponse{Error: "invalid Category ID"})
 		return
 	}
 
@@ -81,13 +80,13 @@ func (ct *categoryAPI) DeleteCategory(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, model.SuccessResponse{Message: "delete category success"})
+	c.JSON(http.StatusOK, model.SuccessResponse{Message: "category delete success"})
 }
 
 func (ct *categoryAPI) GetCategoryByID(c *gin.Context) {
 	categoryID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, model.ErrorResponse{Error: "Invalid category ID"})
+		c.JSON(http.StatusBadRequest, model.ErrorResponse{Error: "invalid Category ID"})
 		return
 	}
 
@@ -101,7 +100,7 @@ func (ct *categoryAPI) GetCategoryByID(c *gin.Context) {
 }
 
 func (ct *categoryAPI) GetCategoryList(c *gin.Context) {
-	categories, err := ct.categoryService.GetAll()
+	categories, err := ct.categoryService.GetList()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{Error: err.Error()})
 		return

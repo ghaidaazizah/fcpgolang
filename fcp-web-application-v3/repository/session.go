@@ -25,7 +25,7 @@ func NewSessionsRepo(filebasedDb *filebased.Data) *sessionsRepo {
 }
 
 func (u *sessionsRepo) AddSessions(session model.Session) error {
-	err := u.filebasedDb.StoreSession(session)
+	err := u.filebasedDb.AddSession(session)
 	if err != nil {
 		return fmt.Errorf("failed to add session: %v", err)
 	}
@@ -33,12 +33,7 @@ func (u *sessionsRepo) AddSessions(session model.Session) error {
 }
 
 func (u *sessionsRepo) DeleteSession(token string) error {
-	session, err := u.SessionAvailToken(token)
-	if err != nil {
-		return fmt.Errorf("session with token %s not found: %v", token, err)
-	}
-
-	err = u.filebasedDb.DeleteSession(session)
+	err := u.filebasedDb.DeleteSession(token)
 	if err != nil {
 		return fmt.Errorf("failed to delete session: %v", err)
 	}
@@ -47,14 +42,7 @@ func (u *sessionsRepo) DeleteSession(token string) error {
 }
 
 func (u *sessionsRepo) UpdateSessions(session model.Session) error {
-	existingSession, err := u.SessionAvailToken(session.Token)
-	if err != nil {
-		return fmt.Errorf("session not found: %v", err)
-	}
-
-	existingSession.Expiry = session.Expiry
-
-	err = u.filebasedDb.StoreSession(*existingSession)
+	err := u.filebasedDb.UpdateSession(session)
 	if err != nil {
 		return fmt.Errorf("failed to update session: %v", err)
 	}
@@ -63,7 +51,7 @@ func (u *sessionsRepo) UpdateSessions(session model.Session) error {
 }
 
 func (u *sessionsRepo) SessionAvailEmail(email string) (model.Session, error) {
-	session, err := u.filebasedDb.GetSessionByEmail(email)
+	session, err := u.filebasedDb.SessionAvailEmail(email)
 	if err != nil {
 		return model.Session{}, fmt.Errorf("session not found for email %s: %v", email, err)
 	}
@@ -71,7 +59,7 @@ func (u *sessionsRepo) SessionAvailEmail(email string) (model.Session, error) {
 }
 
 func (u *sessionsRepo) SessionAvailToken(token string) (model.Session, error) {
-	session, err := u.filebasedDb.GetSessionByToken(token)
+	session, err := u.filebasedDb.SessionAvailToken(token)
 	if err != nil {
 		return model.Session{}, fmt.Errorf("session not found for token %s: %v", token, err)
 	}
