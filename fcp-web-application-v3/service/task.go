@@ -11,8 +11,6 @@ type TaskService interface {
 	Delete(id int) error
 	GetByID(id int) (*model.Task, error)
 	GetList() ([]model.Task, error)
-	GetAll() ([]model.Task, error)            
-	GetByCategory(id int) ([]model.Task, error)
 	GetTaskCategory(id int) ([]model.TaskCategory, error)
 }
 
@@ -66,22 +64,6 @@ func (s *taskService) GetList() ([]model.Task, error) {
 		return nil, err
 	}
 
-	return tasks, nil
-}
-
-func (s *taskService) GetAll() ([]model.Task, error) {
-	tasks, err := s.taskRepository.GetList()  
-	if err != nil {
-		return nil, err
-	}
-	return tasks, nil
-}
-
-func (s *taskService) GetByCategory(id int) ([]model.Task, error) {
-	tasks, err := s.taskRepository.GetTaskCategory(id)  
-	if err != nil {
-		return nil, err
-	}
 	return tasks, nil
 }
 

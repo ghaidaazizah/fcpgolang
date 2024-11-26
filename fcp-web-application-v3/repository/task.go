@@ -3,7 +3,6 @@ package repository
 import (
 	"a21hc3NpZ25tZW50/db/filebased"
 	"a21hc3NpZ25tZW50/model"
-	"fmt"
 )
 
 type TaskRepository interface {
@@ -28,36 +27,24 @@ func NewTaskRepo(filebasedDb *filebased.Data) *taskRepository {
 func (t *taskRepository) Store(task *model.Task) error {
 	err := t.filebased.StoreTask(*task)
 	if err != nil {
-		return fmt.Errorf("failed to store task: %v", err)
+		return err
 	}
 	return nil
 }
 
 func (t *taskRepository) Update(taskID int, task *model.Task) error {
-	existingTask, err := t.filebased.GetTaskByID(taskID)
+	err := t.filebased.UpdateTask(taskID, *task)
 	if err != nil {
-		return fmt.Errorf("task with id %d not found: %v", taskID, err)
+		return err
 	}
 
-	existingTask.Title = task.Title
-	existingTask.Description = task.Description
-	existingTask.DueDate = task.DueDate
-	err = t.filebased.StoreTask(*existingTask)
-	if err != nil {
-		return fmt.Errorf("failed to update task: %v", err)
-	}
 	return nil
 }
 
 func (t *taskRepository) Delete(id int) error {
-	task, err := t.filebased.GetTaskByID(id)
+	err := t.filebased.DeleteTask(id)
 	if err != nil {
-		return fmt.Errorf("task with id %d not found: %v", id, err)
-	}
-
-	err = t.filebased.DeleteTask(*task)
-	if err != nil {
-		return fmt.Errorf("failed to delete task: %v", err)
+		return err
 	}
 	return nil
 }
@@ -65,23 +52,23 @@ func (t *taskRepository) Delete(id int) error {
 func (t *taskRepository) GetByID(id int) (*model.Task, error) {
 	task, err := t.filebased.GetTaskByID(id)
 	if err != nil {
-		return nil, fmt.Errorf("task with id %d not found: %v", id, err)
+		return nil, err
 	}
 	return task, nil
 }
 
 func (t *taskRepository) GetList() ([]model.Task, error) {
-	tasks, err := t.filebased.GetAllTasks()
+	tasks, err := t.filebased.GetTasks()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get tasks: %v", err)
+		return tasks, err
 	}
 	return tasks, nil
 }
 
 func (t *taskRepository) GetTaskCategory(id int) ([]model.TaskCategory, error) {
-	categories, err := t.filebased.GetTaskCategoriesByTaskID(id)
+	categories, err := t.filebased.GetTaskListByCategory(id)
 	if err != nil {
-		return nil, fmt.Errorf("task categories for task ID %d not found: %v", id, err)
+		return nil, err
 	}
 	return categories, nil
 }

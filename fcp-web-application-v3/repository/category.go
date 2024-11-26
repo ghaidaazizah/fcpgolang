@@ -3,7 +3,6 @@ package repository
 import (
 	"a21hc3NpZ25tZW50/db/filebased"
 	"a21hc3NpZ25tZW50/model"
-	"fmt"
 )
 
 type CategoryRepository interface {
@@ -23,35 +22,22 @@ func NewCategoryRepo(filebasedDb *filebased.Data) *categoryRepository {
 }
 
 func (c *categoryRepository) Store(Category *model.Category) error {
-	c.filebasedDb.StoreCategory(*Category) 
+	c.filebasedDb.StoreCategory(*Category)
 	return nil
 }
 
 func (c *categoryRepository) Update(id int, category model.Category) error {
-	existingCategory, err := c.filebasedDb.GetCategoryByID(id)
+	err := c.filebasedDb.UpdateCategory(id, category)
 	if err != nil {
-		return fmt.Errorf("category not found: %v", err)
-	}
-
-	existingCategory.Name = category.Name
-	existingCategory.Description = category.Description
-
-	err = c.filebasedDb.StoreCategory(*existingCategory)
-	if err != nil {
-		return fmt.Errorf("failed to update category: %v", err)
+		return err
 	}
 	return nil
 }
 
 func (c *categoryRepository) Delete(id int) error {
-	category, err := c.filebasedDb.GetCategoryByID(id)
+	err := c.filebasedDb.DeleteCategory(id)
 	if err != nil {
-		return fmt.Errorf("category not found: %v", err)
-	}
-
-	err = c.filebasedDb.DeleteCategory(*category)
-	if err != nil {
-		return fmt.Errorf("failed to delete category: %v", err)
+		return err
 	}
 	return nil
 }
@@ -59,15 +45,15 @@ func (c *categoryRepository) Delete(id int) error {
 func (c *categoryRepository) GetByID(id int) (*model.Category, error) {
 	category, err := c.filebasedDb.GetCategoryByID(id)
 	if err != nil {
-		return nil, fmt.Errorf("category not found: %v", err)
+		return nil, err
 	}
 	return category, nil
 }
 
 func (c *categoryRepository) GetList() ([]model.Category, error) {
-	categories, err := c.filebasedDb.GetAllCategories()
+	categories, err := c.filebasedDb.GetCategories()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get category list: %v", err)
+		return nil, err
 	}
 	return categories, nil
 }

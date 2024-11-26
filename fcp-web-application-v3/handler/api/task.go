@@ -97,7 +97,7 @@ func (t *taskAPI) GetTaskByID(c *gin.Context) {
 }
 
 func (t *taskAPI) GetTaskList(c *gin.Context) {
-	tasks, err := t.taskService.GetAll()
+	tasks, err := t.taskService.GetList()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{Error: err.Error()})
 		return
@@ -107,13 +107,13 @@ func (t *taskAPI) GetTaskList(c *gin.Context) {
 }
 
 func (t *taskAPI) GetTaskListByCategory(c *gin.Context) {
-	categoryID, err := strconv.Atoi(c.Param("category_id"))
+	categoryID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, model.ErrorResponse{Error: "Invalid category ID"})
 		return
 	}
 
-	tasks, err := t.taskService.GetByCategory(categoryID)
+	tasks, err := t.taskService.GetTaskCategory(categoryID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, model.ErrorResponse{Error: err.Error()})
 		return
